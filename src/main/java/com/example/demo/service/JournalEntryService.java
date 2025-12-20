@@ -3,10 +3,10 @@ package com.example.demo.service;
 import com.example.demo.Repository.JournalEntryRepo;
 import com.example.demo.entity.JournalEntry;
 import com.example.demo.entity.User;
-import jakarta.transaction.Transactional;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
