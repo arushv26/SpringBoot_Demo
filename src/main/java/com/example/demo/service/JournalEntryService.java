@@ -21,11 +21,16 @@ public class JournalEntryService {
 
     @Transactional
     public void saveEntry(JournalEntry journalEntry, String userName){
-        User user = userService.findByUserName(userName);
-        journalEntry.setDate(LocalDateTime.now());
-        JournalEntry saved = journalEntryRepo.save(journalEntry);
-        user.getJournalEntries().add(saved);
-        userService.saveEntry(user);
+        try {
+            User user = userService.findByUserName(userName);
+            journalEntry.setDate(LocalDateTime.now());
+            JournalEntry saved = journalEntryRepo.save(journalEntry);
+            user.getJournalEntries().add(saved);
+            userService.saveUser(user);
+        } catch (Exception e) {
+            System.out.println(e);
+            throw new RuntimeException("An error occured",e);
+        }
     }
     public void saveEntry(JournalEntry journalEntry){
         journalEntryRepo.save(journalEntry);
@@ -36,11 +41,25 @@ public class JournalEntryService {
     public Optional<JournalEntry> findById(ObjectId myId){
         return journalEntryRepo.findById(myId);
     }
-    public void deleteById(ObjectId myId, String userName){
-        User user = userService.findByUserName(userName);
-        user.getJournalEntries().removeIf(x -> x.getId().equals(myId));
-        userService.saveEntry(user);
-        journalEntryRepo.deleteById(myId);
+
+    @Transactional
+    public boolean deleteById(ObjectId myId, String userName){
+        boolean removed=false;
+        try {
+            User user = userService.findByUserName(userName);
+            removed = user.getJournalEntries().removeIf(x -> x.getId().equals(myId));
+            if (removed) {
+                userService.saveUser(user);
+                journalEntryRepo.deleteById(myId);
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+            throw new RuntimeException("error in deleting entry",e);
+        }
+        return removed;
     }
+//    public List<JournalEntry> findByUserName(String userName){
+//
+//    }
 
 }
